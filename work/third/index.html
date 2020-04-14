@@ -24,6 +24,15 @@
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
+      $(function(){
+        $(".nav").find("li").click(function(){
+          $(".contents").find("li").addClass("is-hidden");
+          var navindex = $(this).index();
+          $(".contents").find("li").eq(navindex).removeClass("is-hidden");
+
+        });
+
+      });
       // 今回やるのはタブメニューです。
       // navの小要素であるliをクリックして、contents内の小要素であるli要素を表示させる。
       // .index() 要素のindexを取得します。
