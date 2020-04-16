@@ -84,7 +84,26 @@
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
-      // 今回やるのはソート機能です。
+      $(function() {
+
+        $(".select").change(function() {
+          $(".list").find("li").hide();
+          var opClick = $(this).val();
+          if(opClick =="all" ){
+            $(".list").find("li").show();
+          }else{
+            $(".list").find("li").each(function() {
+              if($(this).data("category-type")==opClick){
+                $(this).show();
+              }else{
+                false;
+              };
+            });
+            };
+          });
+        });
+        
+        // 今回やるのはソート機能です。
       // selectボックスをクリックして言語を選び、その言語と関係のあるリストだけが表示されるプログラムです。
       // [処理の流れ]
       // ・セレクトボックスをクリックする。
