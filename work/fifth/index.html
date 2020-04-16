@@ -88,14 +88,12 @@
         $(".select").change(function() {
           $(".list").find("li").hide();
           var opClick = $(this).val();
-          if(opClick =="all" ) {
+          if(opClick ==="all" ) {
             $(".list").find("li").show();
           }else{
             $(".list").find("li").each(function() {
               if($(this).data("category-type")==opClick) {
                 $(this).show();
-              }else {
-                false;
               };
             });
             };

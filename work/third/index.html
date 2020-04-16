@@ -26,9 +26,10 @@
     <script>
       $(function(){
         $(".nav").find("li").click(function(){
-          $(".contents").find("li").addClass("is-hidden");
           var navindex = $(this).index();
-          $(".contents").find("li").eq(navindex).removeClass("is-hidden");
+          $(".contents").find("li")
+          .addClass("is-hidden")
+          .eq(navindex).removeClass("is-hidden");
 
         });
 
