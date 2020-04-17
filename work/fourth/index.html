@@ -49,11 +49,11 @@
     <script>
       $(function() {
         $(".menu__list li").hover(function() {
-          $(this).children()
+          $(this).children("ul")
           .stop()
           .slideDown(500)
         },function() {
-          $(this).children(".menu__list__childList")
+          $(this).children("ul")
           .stop()
           .slideUp(500);
         });

@@ -91,9 +91,9 @@
           if(opClick ==="all" ) {
             $(".list").find("li").show();
           }else{
-            $(".list").find("li").each(function() {
-              if($(this).data("category-type")==opClick) {
-                $(this).show();
+            $(".list").find("li").each(function(index, element) {
+              if($(element).data("category-type")===opClick) {
+                $(element).show();
               };
             });
             };
