@@ -22,24 +22,14 @@
           <button id="js-search-button" class="search__btn">検索する</button>
         </div>
         <ul class="lists">
-          <li class='lists__item'>
-            <div class='lists__item__inner'>
-              <a href='' class='lists__item__link' target='_blank'>
-                <img src='' class='lists__item__img' alt=''>
-                <p class='lists__item__detail titlename'>作品名：</p>
-                <p class='lists__item__detail'>作者　：</p>
-                <p class='lists__item__detail'>出版社：</p>
-              </a>
-            </div>
-          </li>
         </ul>
       </div>
-    </div>
-    <div class="js-pager">
-      <ul class="btn-wrapper">
-        <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
-        <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
-      </ul>
+      <div class="js-pager">
+        <ul class="btn-wrapper">
+          <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
+          <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
+        </ul>
+      </div>
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
@@ -73,38 +63,42 @@
             hits: "20",
             keyword: search,
             booksGenreId: '001',
-
-
           },
         }).done(function(data) {
           // この中にデータ取得後の動きを記述していきます。
 
           if (data.count >0 ) {
-            //$("").empty();
-
-            $(".Item").each(function(index, element){
-              // var booktitle = $(this).find(".title");
-              // $(".lists__item__detail") = booktitle;
-              // $(".Items").show();
-              // console.log($(".titlename")+ (booktitle));
-
-              var textbox = {"titleBox": $(this).title, "authorBox":$(element).author, "publisherBox":$(element).publisherName};
-              // textbox.titleBox = $(this).title;
-              // textbox.authorBox = $(this).author;
-              // textbox.publisherBox = $(this).publisherName;
-              console.log(textbox.titleBox)
-            })
-              
-
+            $("ul").empty();
+            $.each( data.Items, function(index, element){
+            $("ul").first().prepend("<li class='lists__item'>"
+            + "<div class='lists__item__inner'>"
+            + "<a href='" 
+            + element.Item.itemUrl 
+            + "' class='lists__item__link' target='_blank'>"
+            + "<img src='"
+            + element.Item.mediumImageUrl 
+            + "' class='lists__item__img' alt=''>"
+            + "<p class='lists__item__detail titlename'>作品名：" 
+            + element.Item.title  
+            + "</p>"
+            + "<p class='lists__item__detail'>作者　：" 
+            + element.Item.author 
+            + "</p>"
+            + "<p class='lists__item__detail'>出版社：" 
+            + element.Item.publisherName 
+            + "</p>"
+            + "</a>"
+            + "</div>"
+            + "</li>");
+            });
           }else {
-            $(".notfound").empty();
-            $(".lists").before("<p class = notfound> 検索結果が見つかりませんでし た。<br>別のキーワードで検索して下さい。</p>")
+            $(".message").empty();
+            $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")
           };
 
 
 
 
-          console.log(data);
           console.log(data);
         });
       });
