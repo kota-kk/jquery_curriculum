@@ -24,12 +24,12 @@
         <ul class="lists">
         </ul>
       </div>
-      <div class="js-pager">
+      <!-- <div class="js-pager">
         <ul class="btn-wrapper">
           <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
           <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
         </ul>
-      </div>
+      </div> -->
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
@@ -69,7 +69,7 @@
 
           if (data.count >0 ) {
             $("ul").empty();
-            $.each( data.Items, function(index, element){
+            $.each( data.Items, function(index, element) {
             $("ul").first().prepend("<li class='lists__item'>"
             + "<div class='lists__item__inner'>"
             + "<a href='" 
@@ -90,10 +90,14 @@
             + "</a>"
             + "</div>"
             + "</li>");
+            //ページャ
+
             });
           }else {
             $(".message").empty();
             $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")
+            //ページャ
+
           };
 
 
