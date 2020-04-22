@@ -67,42 +67,66 @@
         }).done(function(data) {
           // この中にデータ取得後の動きを記述していきます。
 
+          //ページャのテンプレート
+        //   <div class="js-pager">
+        // <ul class="btn-wrapper">
+        //   <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
+        //   <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
+        // </ul>
+      // </div>
+
+
+
+
+
+
+
+
+          var prepager = ("<li class='prev btn-item'>" + "<a class='btn-anchor' href='" +  + "'>" + "前へ" + "</a>" + "</li>");
+          var nextpager = ("<li class='next btn-item'>" + "<a class='btn-anchor' href='" +  + "'>" + "次へ" + "</a>" + "</li>");
+
+          $("ul").last().append("<div class='js-pager'>" +
+            "<ul class='btn-wrapper'>" +
+             prepager +
+             nextpager +
+            "</ul1>" +
+          "</div>");
+
           if (data.count >0 ) {
             $("ul").empty();
-            $.each( data.Items, function(index, element) {
-            $("ul").first().prepend("<li class='lists__item'>"
-            + "<div class='lists__item__inner'>"
-            + "<a href='" 
-            + element.Item.itemUrl 
-            + "' class='lists__item__link' target='_blank'>"
-            + "<img src='"
-            + element.Item.mediumImageUrl 
-            + "' class='lists__item__img' alt=''>"
-            + "<p class='lists__item__detail titlename'>作品名：" 
-            + element.Item.title  
-            + "</p>"
-            + "<p class='lists__item__detail'>作者　：" 
-            + element.Item.author 
-            + "</p>"
-            + "<p class='lists__item__detail'>出版社：" 
-            + element.Item.publisherName 
-            + "</p>"
-            + "</a>"
-            + "</div>"
-            + "</li>");
-            //ページャ
+            $.each(data.Items, function(index, element) {
+            $("ul").first().prepend("<li class='lists__item'>" +
+              "<div class='lists__item__inner'>" +
+               "<a href='" + element.Item.itemUrl + "' class='lists__item__link' target='_blank'>" +
+                 "<img src='" + element.Item.mediumImageUrl + "' class='lists__item__img' alt=''>" +
+                 "<p class='lists__item__detail titlename'>作品名：" + element.Item.title + "</p>" +
+                 "<p class='lists__item__detail'>作者　：" + element.Item.author + "</p>" +
+                 "<p class='lists__item__detail'>出版社：" + element.Item.publisherName + "</p>" +
+               "</a>" +
+              "</div>" +
+            "</li>");
+          //ページャ
+
+          $("ul").last().append().empty();
+          $("ul").last().append("<div class='js-pager'>" +
+            "<ul class='btn-wrapper'>" +
+             prepager +
+             nextpager +
+            "</ul1>" +
+          "</div>");
 
             });
-          }else {
+
+          } else {
             $(".message").empty();
             $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")
-            //ページャ
 
           };
+        
 
 
 
-
+          console.log($("data"));
           console.log(data);
         });
       });
@@ -144,3 +168,23 @@
     </script>
   </body>
 </html>
+<!-- $(function(){
+  for (var i=0; i< ;i++)
+}) -->
+if(現在のページ　<　ページのカウント総数){
+  $("ページャ").empty();
+}
+
+if(data.last < data.count){
+  $("nextページャ").css("backgroundcolor" "glay");
+  nextページャそ表示
+} else {
+  $("nextページャ").css("backgroundcolor" "glay");
+}
+
+if(last <= 20){
+  $("nextページャ").css("backgroundcolor" "glay");
+  nextページャそ表示
+} else {
+  $("nextページャ").css("backgroundcolor" "glay");
+}
