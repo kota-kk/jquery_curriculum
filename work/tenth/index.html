@@ -49,91 +49,80 @@
 
       $(function(){
 
-        
-        $(document).on("click",".search__btn",function(){
-          search();
-          },
-        $(document).on("click",".next",function(){
+        //クリックイベントの作成ーーーーーーーーーーーーーーーーーーーーー
+        $(document).on("click", ".search__btn", function() {
+          search();                //searchで読み込みエラー
+          });
+        $(document).on("click",".next",function() {
           search();
           page++;
-          },
-        $(document).on("click",".prev",function(){
+          });
+        $(document).on("click",".prev",function() {
           search();
           page--;
-          },
+          });
 
 
-          $(function search(){
+        //サーチの内容を定義ーーーーーーーーーーーーーーーーーーーーーー
+
+        var search = function() {
+            
+
           var keyword = $(".search__text__input").val();
-        $.ajax({
-          url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
-          type: 'GET',
-          datatype: 'json',
-          data: {
-            // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れ  ましょう。
-            applicationId: '1019399324990976605', // (今回はこのIDを使用してくださ  い) ※IDは他サイト等には絶対に転載しないでください
-            // hits: "20",
-            hits: "20",
-            keyword: keyword,
-            booksGenreId: '001',
-            page: 1,
-        }.done(function(data) {
-          // この中にデータ取得後の動きを記述していきます。
+          $.ajax({
+            url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/ 20130522',
+            type: 'GET',
+            datatype: 'json',
+            data: {
+              // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内  に入れ  ましょう。
+              applicationId: '1019399324990976605',
+              hits: "20",
+              keyword: keyword,
+              booksGenreId: '001',
+              page: 1,
+          }.done(function(data) {
+           // この中にデータ取得後の動きを記述していきます。
 
-          //ページャのテンプレート
-        //   <div class="js-pager">
-        // <ul class="btn-wrapper">
-        //   <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
-        //   <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
-        // </ul>
-      // </div>
+           //ページャのテンプレート
+            //   <div class="js-pager">
+           // <ul class="btn-wrapper">
+           //   <li class="prev btn-item">< class="btn-anchor" href="">前へ</  a></li>
+            //   <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
+           // </ul>
+           // </div>
 
+            if (data.count >0 ) {
+              //----------------------本があったら-------------------------
 
+              //-----------作品を表示-----------
+              $("ul").empty();
+              $.each(data.Items, function(index, element) {
+                $("ul").first().prepend(
+                  "<li class='lists__item'>" +
+                    "<div class='lists__item__inner'>" +
+                      "<a href='" + element.Item.itemUrl + "'class='lists__item__link' target='_blank'>" +
+                        "<img src='" + element.Item.mediumImageUrl + "'class='lists__item__img' alt=''>" +
+                        "<p class='lists__item__detail titlename'>作品名：" + element.Item.title + "</p>" +
+                        "<p class='lists__item__detail'>作者　：" + element.Item.author + "</p>" +
+                        "<p class='lists__item__detail'>出版社：" + element.Item.publisherName + "</p>" +
+                      "</a>" +
+                    "</div>" +
+                  "</li>");
+                });
 
-
-
-
-          // var pluspage = page++ ;
-          // <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
-          // var prepager = ("<li class='prev btn-item'>" + "<a class='btn-anchor' href=''>" + "前へ" + "</a>" + "</li>");
-          // var nextpager = ("<li class='next btn-item'>" + "<a class='btn-anchor' href='" + "pluspage" + "'>" + "次へ" + "</a>" + "</li>");
-
-          // $("ul").last().append("<div class='js-pager'>" +
-          //   "<ul class='btn-wrapper'>" +
-          //    prepager +
-          //    nextpager +
-          //   "</ul1>" +
-          // "</div>");
-
-          if (data.count >0 ) {
-            $("ul").empty();
-            $.each(data.Items, function(index, element) {
-            $("ul").first().prepend("<li class='lists__item'>" +
-              "<div class='lists__item__inner'>" +
-               "<a href='" + element.Item.itemUrl + "' class='lists__item__link' target='_blank'>" +
-                 "<img src='" + element.Item.mediumImageUrl + "' class='lists__item__img' alt=''>" +
-                 "<p class='lists__item__detail titlename'>作品名：" + element.Item.title + "</p>" +
-                 "<p class='lists__item__detail'>作者　：" + element.Item.author + "</p>" +
-                 "<p class='lists__item__detail'>出版社：" + element.Item.publisherName + "</p>" +
-               "</a>" +
-              "</div>" +
-            "</li>");
-          //ページャ
-
-
-            });
           // $(".js-pager'").empty();
-          var nextpage = $(data.page) + 1;
+          //-------------------ページャを表示-----------------------
           $(".js-pager").prepend(
             "<ul class='btn-wrapper'>" +
-              "<li class='next btn-item'>" + "<a class='btn-anchor' href='" + nextpage + "'>" + "次へ" + "</a>" + "</li>" +
+              "<li class='prev btn-item'>" + "<a class='btn-anchor' href=''>" + "前へ" + "</a>" + "</li>" +
+              "<li class='next btn-item'>" + "<a class='btn-anchor' href=''>" + "次へ" + "</a>" + "</li>" +
             "</ul1>" );
 
           } else {
-            $(".message").empty();
-            $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")
-
-          };
+            //-----------------------本がなければ--------------------------
+            $(".message").empty();           //初期化処理
+            $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")  //メッセージを追加
+          }
         
 
 
@@ -141,10 +130,10 @@
           console.log($("data.page"));
           console.log(data);
         }.fail(function() {
-
+          //------------------失敗時の処理（最後）--------------------------
         })),   //fail.done
       }); //ajax
-          });  //function search
+          };  //function search
       //
       //
       // $.ajaxによってデータが取得できたら、必要なデータ(作品名とか作者名とか)を取得します。
@@ -198,7 +187,7 @@
 //   $("nextページャ").css("backgroundcolor" "glay");
 // }
 
-      });
+      });   //jqueryここまで
 
     </script>
   </body>
