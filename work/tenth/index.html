@@ -24,12 +24,12 @@
         <ul class="lists">
         </ul>
       </div>
-      <!-- <div class="js-pager">
-        <ul class="btn-wrapper">
+      <div class="js-pager">
+        <!-- <ul class="btn-wrapper">
           <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
           <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
-        </ul>
-      </div> -->
+        </ul> -->
+      </div>
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
@@ -48,10 +48,23 @@
       //
 
       $(function(){
+
         
-          // $("ul").empty();
         $(document).on("click",".search__btn",function(){
-          var search = $(".search__text__input").val();
+          search();
+          },
+        $(document).on("click",".next",function(){
+          search();
+          page++;
+          },
+        $(document).on("click",".prev",function(){
+          search();
+          page--;
+          },
+
+
+          $(function search(){
+          var keyword = $(".search__text__input").val();
         $.ajax({
           url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
           type: 'GET',
@@ -61,10 +74,10 @@
             applicationId: '1019399324990976605', // (今回はこのIDを使用してくださ  い) ※IDは他サイト等には絶対に転載しないでください
             // hits: "20",
             hits: "20",
-            keyword: search,
+            keyword: keyword,
             booksGenreId: '001',
-          },
-        }).done(function(data) {
+            page: 1,
+        }.done(function(data) {
           // この中にデータ取得後の動きを記述していきます。
 
           //ページャのテンプレート
@@ -80,17 +93,17 @@
 
 
 
+          // var pluspage = page++ ;
+          // <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
+          // var prepager = ("<li class='prev btn-item'>" + "<a class='btn-anchor' href=''>" + "前へ" + "</a>" + "</li>");
+          // var nextpager = ("<li class='next btn-item'>" + "<a class='btn-anchor' href='" + "pluspage" + "'>" + "次へ" + "</a>" + "</li>");
 
-
-          var prepager = ("<li class='prev btn-item'>" + "<a class='btn-anchor' href='" +  + "'>" + "前へ" + "</a>" + "</li>");
-          var nextpager = ("<li class='next btn-item'>" + "<a class='btn-anchor' href='" +  + "'>" + "次へ" + "</a>" + "</li>");
-
-          $("ul").last().append("<div class='js-pager'>" +
-            "<ul class='btn-wrapper'>" +
-             prepager +
-             nextpager +
-            "</ul1>" +
-          "</div>");
+          // $("ul").last().append("<div class='js-pager'>" +
+          //   "<ul class='btn-wrapper'>" +
+          //    prepager +
+          //    nextpager +
+          //   "</ul1>" +
+          // "</div>");
 
           if (data.count >0 ) {
             $("ul").empty();
@@ -107,15 +120,14 @@
             "</li>");
           //ページャ
 
-          $("ul").last().append().empty();
-          $("ul").last().append("<div class='js-pager'>" +
-            "<ul class='btn-wrapper'>" +
-             prepager +
-             nextpager +
-            "</ul1>" +
-          "</div>");
 
             });
+          // $(".js-pager'").empty();
+          var nextpage = $(data.page) + 1;
+          $(".js-pager").prepend(
+            "<ul class='btn-wrapper'>" +
+              "<li class='next btn-item'>" + "<a class='btn-anchor' href='" + nextpage + "'>" + "次へ" + "</a>" + "</li>" +
+            "</ul1>" );
 
           } else {
             $(".message").empty();
@@ -126,10 +138,13 @@
 
 
 
-          console.log($("data"));
+          console.log($("data.page"));
           console.log(data);
-        });
-      });
+        }.fail(function() {
+
+        })),   //fail.done
+      }); //ajax
+          });  //function search
       //
       //
       // $.ajaxによってデータが取得できたら、必要なデータ(作品名とか作者名とか)を取得します。
@@ -162,29 +177,29 @@
       //
       //
 
+// <!-- $(function(){
+//   for (var i=0; i< ;i++)
+// }) -->
+// if(現在のページ　<　ページのカウント総数){
+//   $("ページャ").empty();
+// }
+
+// if(data.last < data.count){
+//   $("nextページャ").css("backgroundcolor" "glay");
+//   nextページャそ表示
+// } else {
+//   $("nextページャ").css("backgroundcolor" "glay");
+// }
+
+// if(last <= 20){
+//   $("nextページャ").css("backgroundcolor" "glay");
+//   nextページャそ表示
+// } else {
+//   $("nextページャ").css("backgroundcolor" "glay");
+// }
 
       });
 
     </script>
   </body>
 </html>
-<!-- $(function(){
-  for (var i=0; i< ;i++)
-}) -->
-if(現在のページ　<　ページのカウント総数){
-  $("ページャ").empty();
-}
-
-if(data.last < data.count){
-  $("nextページャ").css("backgroundcolor" "glay");
-  nextページャそ表示
-} else {
-  $("nextページャ").css("backgroundcolor" "glay");
-}
-
-if(last <= 20){
-  $("nextページャ").css("backgroundcolor" "glay");
-  nextページャそ表示
-} else {
-  $("nextページャ").css("backgroundcolor" "glay");
-}
