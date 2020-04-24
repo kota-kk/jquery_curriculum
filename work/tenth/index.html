@@ -54,7 +54,7 @@
           search();                //searchで読み込みエラー
           });
         $(document).on("click",".next",function() {
-          search();
+          search()
           page++;
           });
         $(document).on("click",".prev",function() {
@@ -67,7 +67,7 @@
 
         var search = function() {
             
-
+          $(".message").empty();           //メッセージの初期化処理
           var keyword = $(".search__text__input").val();
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/ 20130522',
@@ -80,7 +80,7 @@
               keyword: keyword,
               booksGenreId: '001',
               page: 1,
-          }.done(function(data) {
+          }}).done(function(data) {           //ajaxとdata閉じ
            // この中にデータ取得後の動きを記述していきます。
 
            //ページャのテンプレート
@@ -93,7 +93,6 @@
 
             if (data.count >0 ) {
               //----------------------本があったら-------------------------
-
               //-----------作品を表示-----------
               $("ul").empty();
               $.each(data.Items, function(index, element) {
@@ -109,7 +108,6 @@
                     "</div>" +
                   "</li>");
                 });
-
           // $(".js-pager'").empty();
           //-------------------ページャを表示-----------------------
           $(".js-pager").prepend(
@@ -118,9 +116,19 @@
               "<li class='next btn-item'>" + "<a class='btn-anchor' href=''>" + "次へ" + "</a>" + "</li>" +
             "</ul1>" );
 
+            if(data.page === 1){
+              $(".prev").addclass('disabled');
+            } else if(data.last === data.counnt) {
+              $(".next").addclass('disabled');
+            } else if(data.count >= 20) {
+              //どちらも書く
+            } else {
+              //どちらにも.removeClass('disabled');
+            }
+
           } else {
             //-----------------------本がなければ--------------------------
-            $(".message").empty();           //初期化処理
+
             $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")  //メッセージを追加
           }
         
@@ -129,10 +137,10 @@
 
           console.log($("data.page"));
           console.log(data);
-        }.fail(function() {
+          console.log(data.first);
+        }).fail(function() {
           //------------------失敗時の処理（最後）--------------------------
-        })),   //fail.done
-      }); //ajax
+        });   //fail.done
           };  //function search
       //
       //
