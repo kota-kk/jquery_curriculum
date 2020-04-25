@@ -24,12 +24,12 @@
         <ul class="lists">
         </ul>
       </div>
-      <div class="js-pager">
+      <!-- <div class="js-pager"> -->
         <!-- <ul class="btn-wrapper">
           <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
           <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
         </ul> -->
-      </div>
+      <!-- </div> -->
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
@@ -55,7 +55,7 @@
           });
         $(document).on("click",".next",function() {
           search()
-          page++;
+          data.page++;
           });
         $(document).on("click",".prev",function() {
           search();
@@ -65,7 +65,7 @@
 
         //サーチの内容を定義ーーーーーーーーーーーーーーーーーーーーーー
 
-        var search = function() {
+        function search() {
             
           $(".message").empty();           //メッセージの初期化処理
           var keyword = $(".search__text__input").val();
@@ -79,7 +79,7 @@
               hits: "20",
               keyword: keyword,
               booksGenreId: '001',
-              page: 1,
+              // page: 1,
           }}).done(function(data) {           //ajaxとdata閉じ
            // この中にデータ取得後の動きを記述していきます。
 
@@ -110,18 +110,20 @@
                 });
           // $(".js-pager'").empty();
           //-------------------ページャを表示-----------------------
-          $(".js-pager").prepend(
-            "<ul class='btn-wrapper'>" +
-              "<li class='prev btn-item'>" + "<a class='btn-anchor' href=''>" + "前へ" + "</a>" + "</li>" +
-              "<li class='next btn-item'>" + "<a class='btn-anchor' href=''>" + "次へ" + "</a>" + "</li>" +
-            "</ul1>" );
+          $(".container").after(
+            "<div class='js-pager'>" +
+              "<ul class='btn-wrapper'>" +
+                "<li class='prev btn-item'>" + "<a class='btn-anchor' href=''>" + "前へ" + "</a>" + "</li>" +
+                "<li class='next btn-item'>" + "<a class='btn-anchor' href=''>" + "次へ" + "</a>" + "</li>" +
+              "</ul1>" +
+            "</div>" );
 
             if(data.page === 1){
-              $(".prev").addclass('disabled');
-            } else if(data.last === data.counnt) {
-              $(".next").addclass('disabled');
-            } else if(data.count >= 20) {
-              //どちらも書く
+              $("li.prev").first("a").addClass('disabled');
+            } else if (data.last === data.count) {
+              $("li.next").first("a").addClass('disabled');
+            } else if (data.count <= 20) {
+              $("li.next").first("a").addClass('disabled');
             } else {
               //どちらにも.removeClass('disabled');
             }
@@ -135,9 +137,9 @@
 
 
 
-          console.log($("data.page"));
-          console.log(data);
-          console.log(data.first);
+          console.log(data.count);
+          console.log(data.last);
+          console.log($("ul[class='btn-wrapper']").children("li[class='next']").next());
         }).fail(function() {
           //------------------失敗時の処理（最後）--------------------------
         });   //fail.done
