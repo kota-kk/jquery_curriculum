@@ -17,7 +17,7 @@
         </div>
         <div class="search">
           <div class="search__text">
-            <input type="text" id="js-search-word" class="search__text__input" placeholder="検索する">
+            <input type="text" id="js-search-word" class="search__text__input" placeholder="検索する" value= "アンパンマン">
           </div>
           <button id="js-search-button" class="search__btn">検索する</button>
         </div>
@@ -50,16 +50,17 @@
       $(function(){
 
         //クリックイベントの作成ーーーーーーーーーーーーーーーーーーーーー
+        var pages = 1;
         $(document).on("click", ".search__btn", function() {
           search();                //searchで読み込みエラー
           });
         $(document).on("click",".next",function() {
-          search()
-          data.page++;
+          pages++
+          search();
           });
         $(document).on("click",".prev",function() {
+          pages--
           search();
-          page--;
           });
 
 
@@ -79,7 +80,7 @@
               hits: "20",
               keyword: keyword,
               booksGenreId: '001',
-              // page: 1,
+              page: pages,
           }}).done(function(data) {           //ajaxとdata閉じ
            // この中にデータ取得後の動きを記述していきます。
 
@@ -94,7 +95,10 @@
             if (data.count >0 ) {
               //----------------------本があったら-------------------------
               //-----------作品を表示-----------
+              $("switch").empty();
               $("ul").empty();
+              $(".js-pager").remove();
+
               $.each(data.Items, function(index, element) {
                 $("ul").first().prepend(
                   "<li class='lists__item'>" +
@@ -113,34 +117,58 @@
           $(".container").after(
             "<div class='js-pager'>" +
               "<ul class='btn-wrapper'>" +
-                "<li class='prev btn-item'>" + "<a class='btn-anchor' href=''>" + "前へ" + "</a>" + "</li>" +
-                "<li class='next btn-item'>" + "<a class='btn-anchor' href=''>" + "次へ" + "</a>" + "</li>" +
+                "<li class='prev btn-item'>" + "<a class='btn-anchor'>" + "前へ" + "</a>" + "</li>" +
+                "<li class='next btn-item'>" + "<a class='btn-anchor'>" + "次へ" + "</a>" + "</li>" +
               "</ul1>" +
             "</div>" );
-
-            if(data.page === 1){
+            console.log(data.count);
+            if(data.count <= 20) {
+              $("li.next").first("a").addClass('disabled');
               $("li.prev").first("a").addClass('disabled');
             } else if (data.last === data.count) {
               $("li.next").first("a").addClass('disabled');
-            } else if (data.count <= 20) {
-              $("li.next").first("a").addClass('disabled');
+            } else if (data.page === 1){
+              $("li.prev").first("a").addClass('disabled');
             } else {
               //どちらにも.removeClass('disabled');
             }
 
           } else {
             //-----------------------本がなければ--------------------------
-
             $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")  //メッセージを追加
           }
         
-
-
-
           console.log(data.count);
-          console.log(data.last);
+          console.log(data.page);
           console.log($("ul[class='btn-wrapper']").children("li[class='next']").next());
-        }).fail(function() {
+        }).fail(function(errorcode) {
+          console.log(errorcode);
+          console.log(errorcode.status);
+          var error = errorcode.status;
+          switch (error){
+            case 400: 
+            $(".search").after("<div class='message'>検索文字が空、もしくは半角英数1文字になっています</div>"); 
+            break;
+          }
+
+          switch (error){
+            case  429: 
+            $(".search").after("<div class='message'>連打しないでください。</div>"); 
+            break;
+          }
+
+          switch (error){
+            default: 
+            $(".search").after("<div class='message'>通信に失敗しました。インターネットの接続を確認してください。</div>"); 
+            break;
+          }
+          // net::ERR_INTERNET_DISCONNECTED
+          // switch (error){
+          //   case"": 
+          //   ; 
+          //   break;
+          // }
+
           //------------------失敗時の処理（最後）--------------------------
         });   //fail.done
           };  //function search
@@ -202,3 +230,4 @@
     </script>
   </body>
 </html>
+
