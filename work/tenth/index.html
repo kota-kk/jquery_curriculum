@@ -17,19 +17,13 @@
         </div>
         <div class="search">
           <div class="search__text">
-            <input type="text" id="js-search-word" class="search__text__input" placeholder="検索する" value= "アンパンマン">
+            <input type="text" id="js-search-word" class="search__text__input" placeholder="検索する" value= "">
           </div>
           <button id="js-search-button" class="search__btn">検索する</button>
         </div>
         <ul class="lists">
         </ul>
       </div>
-      <!-- <div class="js-pager"> -->
-        <!-- <ul class="btn-wrapper">
-          <li class="prev btn-item"><a class="btn-anchor" href="">前へ</a></li>
-          <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
-        </ul> -->
-      <!-- </div> -->
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
@@ -46,12 +40,15 @@
       // $.ajax({}) 外部ファイルやURLに対してデータをリクエストすることができます。
       // 以下は今回使う$.ajaxの基本的な形です。
       //
-
-      $(function(){
-
+      $(function() {  //クリックイベントなので無くても可
+        function empty(){
+          $("ul").empty();
+          $(".message").empty();
+        }
         //クリックイベントの作成ーーーーーーーーーーーーーーーーーーーーー
         var pages = 1;
         $(document).on("click", ".search__btn", function() {
+          pages = 1
           search();                //searchで読み込みエラー
           });
         $(document).on("click",".next",function() {
@@ -62,13 +59,9 @@
           pages--
           search();
           });
-
-
         //サーチの内容を定義ーーーーーーーーーーーーーーーーーーーーーー
-
         function search() {
-            
-          $(".message").empty();           //メッセージの初期化処理
+          empty();         //メッセージの初期化処理
           var keyword = $(".search__text__input").val();
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/ 20130522',
@@ -83,22 +76,12 @@
               page: pages,
           }}).done(function(data) {           //ajaxとdata閉じ
            // この中にデータ取得後の動きを記述していきます。
-
-           //ページャのテンプレート
-            //   <div class="js-pager">
-           // <ul class="btn-wrapper">
-           //   <li class="prev btn-item">< class="btn-anchor" href="">前へ</  a></li>
-            //   <li class="next btn-item"><a class="btn-anchor" href="">次へ</a></li>
-           // </ul>
-           // </div>
-
             if (data.count >0 ) {
               //----------------------本があったら-------------------------
               //-----------作品を表示-----------
+              empty();
               $("switch").empty();
-              $("ul").empty();
               $(".js-pager").remove();
-
               $.each(data.Items, function(index, element) {
                 $("ul").first().prepend(
                   "<li class='lists__item'>" +
@@ -112,7 +95,6 @@
                     "</div>" +
                   "</li>");
                 });
-          // $(".js-pager'").empty();
           //-------------------ページャを表示-----------------------
           $(".container").after(
             "<div class='js-pager'>" +
@@ -121,29 +103,31 @@
                 "<li class='next btn-item'>" + "<a class='btn-anchor'>" + "次へ" + "</a>" + "</li>" +
               "</ul1>" +
             "</div>" );
-            console.log(data.count);
             if(data.count <= 20) {
               $("li.next").first("a").addClass('disabled');
               $("li.prev").first("a").addClass('disabled');
             } else if (data.last === data.count) {
               $("li.next").first("a").addClass('disabled');
+              $(document).on("click",".next",function(){
+                // $(".message").empty();
+                $(".search").after("<div class='message'>これ以上ありません。</div>")
+              }) 
             } else if (data.page === 1){
               $("li.prev").first("a").addClass('disabled');
-            } else {
-              //どちらにも.removeClass('disabled');
             }
+            console.log(data.count)
+            console.log(data.last)
+            console.log(data)
+            console.log(data.page)
 
           } else {
             //-----------------------本がなければ--------------------------
-            $("ul").first().before("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")  //メッセージを追加
+            empty();
+            $(".search").after("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")  //メッセージを追加
           }
-        
-          console.log(data.count);
-          console.log(data.page);
-          console.log($("ul[class='btn-wrapper']").children("li[class='next']").next());
         }).fail(function(errorcode) {
-          console.log(errorcode);
-          console.log(errorcode.status);
+          empty();
+
           var error = errorcode.status;
           switch (error){
             case 400: 
@@ -168,7 +152,6 @@
           //   ; 
           //   break;
           // }
-
           //------------------失敗時の処理（最後）--------------------------
         });   //fail.done
           };  //function search
