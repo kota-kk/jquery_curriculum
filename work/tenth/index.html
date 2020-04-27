@@ -109,7 +109,8 @@
             } else if (data.last === data.count) {
               $("li.next").first("a").addClass('disabled');
               $(document).on("click",".next",function(){
-                // $(".message").empty();
+                $(".message").empty();
+                pages = data.last;
                 $(".search").after("<div class='message'>これ以上ありません。</div>")
               }) 
             } else if (data.page === 1){
@@ -119,12 +120,14 @@
             console.log(data.last)
             console.log(data)
             console.log(data.page)
-
-          } else {
-            //-----------------------本がなければ--------------------------
+          } 
+          // else {
+          //   //-----------------------本がなければ--------------------------
+          if(data.count === 0){
             empty();
             $(".search").after("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")  //メッセージを追加
           }
+          // }
         }).fail(function(errorcode) {
           empty();
 
