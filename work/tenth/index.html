@@ -41,29 +41,44 @@
       // 以下は今回使う$.ajaxの基本的な形です。
       //
       $(function() {  //クリックイベントなので無くても可
-        function empty(){
-          $("ul").empty();
-          $(".message").empty();
-        }
-        //クリックイベントの作成ーーーーーーーーーーーーーーーーーーーーー
+        //クリックイベントの作成ーーーーーーーーーーーーーーーーーーー
+        var allPage;
         var pages = 1;
+
         $(document).on("click", ".search__btn", function() {
           pages = 1
           search();                //searchで読み込みエラー
-          });
+        });
         $(document).on("click",".next",function() {
-          pages++
-          search();
-          });
-        $(document).on("click",".prev",function() {
-          if(pages !== 1){
-          pages--
-          search();
+          if(allPage === pages) {
+            $(".search").after("<div class='message'>これ以上ありません。</div>");
+            return;
           }
-          });
+          pages++;
+          search();
+        });
+        $(document).on("click",".prev",function() {
+          return false;
+          if(pages !== 1){
+            pages--;
+            search();
+          }
+        });
+
+        function vanish(){
+          $("ul").empty();
+          $(".message").empty();
+        }
+
+
+
+
+
+
+        
         //サーチの内容を定義ーーーーーーーーーーーーーーーーーーーーーー
         function search() {
-          empty();         //メッセージの初期化処理
+          vanish();         //メッセージの初期化処理
           var keyword = $(".search__text__input").val();
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/ 20130522',
@@ -78,31 +93,35 @@
               page: pages,
           }}).done(function(data) {           //ajaxとdata閉じ
            // この中にデータ取得後の動きを記述していきます。
-            if (data.count >0 ) {
-              //----------------------本があったら-------------------------
-              //-----------作品を表示-----------
-              empty();
-              $("switch").empty();
+          allPage = data.pageCount;
+          if(data.count === 0) {
+            vanish();
+            $(".search").after("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>"); 
+            return;
+          }
+              //-----------あったら作品を表示-----------
+              vanish();
               $(".js-pager").remove();
+              var portion = "";
               $.each(data.Items, function(index, element) {
-                $("ul").first().prepend(
-                  "<li class='lists__item'>" +
-                    "<div class='lists__item__inner'>" +
-                      "<a href='" + element.Item.itemUrl + "'class='lists__item__link' target='_blank'>" +
-                        "<img src='" + element.Item.mediumImageUrl + "'class='lists__item__img' alt=''>" +
-                        "<p class='lists__item__detail titlename'>作品名：" + element.Item.title + "</p>" +
-                        "<p class='lists__item__detail'>作者　：" + element.Item.author + "</p>" +
-                        "<p class='lists__item__detail'>出版社：" + element.Item.publisherName + "</p>" +
-                      "</a>" +
-                    "</div>" +
-                  "</li>");
-                });
+                  portion += "<li class='lists__item'>" +
+                              "<div class='lists__item__inner'>" +
+                                "<a href='" + element.Item.itemUrl + "'class='lists__item__link' target='_blank'>" +
+                                  "<img src='" + element.Item.mediumImageUrl + "'class='lists__item__img' alt=''>" +
+                                  "<p class='lists__item__detail titlename'>作品名：" + element.Item.title + "</p>" +
+                                  "<p class='lists__item__detail'>作者　：" + element.Item.author + "</p>" +
+                                  "<p class='lists__item__detail'>出版社：" + element.Item.publisherName + "</p>" +
+                                "</a>" +
+                              "</div>" +
+                            "</li>";
+              });
+                $("ul").first().append(portion);
           //-------------------ページャを表示-----------------------
           $(".container").after(
             "<div class='js-pager'>" +
               "<ul class='btn-wrapper'>" +
-                "<li class='prev btn-item'>" + "<a class='btn-anchor'>" + "前へ" + "</a>" + "</li>" +
-                "<li class='next btn-item'>" + "<a class='btn-anchor'>" + "次へ" + "</a>" + "</li>" +
+                "<li class='prev btn-item'><a class='btn-anchor' href=\"#\">前へ</a></li>" +
+                "<li class='next btn-item'><a class='btn-anchor' href=\"#\">次へ</a></li>" +
               "</ul1>" +
             "</div>" );
             if(data.count <= 20) {
@@ -110,52 +129,32 @@
               $("li.prev").first("a").addClass('disabled');
             } else if (data.last === data.count) {
               $("li.next").first("a").addClass('disabled');
-              $(document).on("click",".next",function(){
-                $(".message").empty();
-                pages = data.last;
-                $(".search").after("<div class='message'>これ以上ありません。</div>")
-              }) 
-            } else if (data.page === 1){
+            } else if (data.page === 1) {
               $("li.prev").first("a").addClass('disabled');
             }
-          } 
-          // else {
-          //   //-----------------------本がなければ--------------------------
-          if(data.count === 0){
-            empty();
-            $(".search").after("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>")  //メッセージを追加
-          }
-          // }
-        }).fail(function(errorcode) {
-          empty();
-
-          var error = errorcode.status;
-          switch (error){
-            case 400: 
-            $(".search").after("<div class='message'>検索文字が空、もしくは半角英数1文字になっています</div>"); 
-            break;
-          }
-
-          switch (error){
-            case  429: 
-            $(".search").after("<div class='message'>連打しないでください。</div>"); 
-            break;
-          }
-
-          switch (error){
-            case  0: 
+          console.log(data.last);
+          console.log(data);
+        }).fail(function(error) {
+          vanish();
+          if(!error.responseJSON) {
             $(".search").after("<div class='message'>通信に失敗しました。インターネットの接続を確認してください。</div>"); 
-            break;
+          return;
           }
-          // net::ERR_INTERNET_DISCONNECTED
-          // switch (error){
-          //   case"": 
-          //   ; 
-          //   break;
-          // }
+          var errorcode = error.status;
+          switch (errorcode){
+            case 400: 
+              $(".search").after("<div class='message'>検索文字が空、もしくは半角英数1文字になっています</div>"); 
+              break;
+            case  429: 
+              $(".search").after("<div class='message'>連打しないでください。</div>"); 
+              break;
+            default: 
+              $(".search").after("<div class='message'>原因不明のエラー</div>");
+              break;
+          }
           //------------------失敗時の処理（最後）--------------------------
         });   //fail.done
-          };  //function search
+      };  //function search
       //
       //
       // $.ajaxによってデータが取得できたら、必要なデータ(作品名とか作者名とか)を取得します。
@@ -187,30 +186,7 @@
       // </div>
       //
       //
-
-// <!-- $(function(){
-//   for (var i=0; i< ;i++)
-// }) -->
-// if(現在のページ　<　ページのカウント総数){
-//   $("ページャ").empty();
-// }
-
-// if(data.last < data.count){
-//   $("nextページャ").css("backgroundcolor" "glay");
-//   nextページャそ表示
-// } else {
-//   $("nextページャ").css("backgroundcolor" "glay");
-// }
-
-// if(last <= 20){
-//   $("nextページャ").css("backgroundcolor" "glay");
-//   nextページャそ表示
-// } else {
-//   $("nextページャ").css("backgroundcolor" "glay");
-// }
-
       });   //jqueryここまで
-
     </script>
   </body>
 </html>
