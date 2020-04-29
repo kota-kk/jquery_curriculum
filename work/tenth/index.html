@@ -27,7 +27,6 @@
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
-
       // 楽天ブックスの総合検索APIを使って製作してください。
       // answerの挙動を良く見てね！
       //
@@ -41,50 +40,58 @@
       // 以下は今回使う$.ajaxの基本的な形です。
       //
       $(function() {  //クリックイベントなので無くても可
-        //クリックイベントの作成ーーーーーーーーーーーーーーーーーーー
+        // -------------------------変数名定義-------------------------------
         var allPage;
         var pages = 1;
-        // var doneConect;
+        
+        function searchAftre(text) {
+          $(".search").after(text);
+        };
+        
+        //----------------------クリックイベントの作成--------------------------------
         $(document).on("click", ".search__btn", function() {
           pages = 1
           search();                //searchで読み込みエラー
         });
         $(document).on("click", ".next", function() {
           if(allPage === pages) {
-            $(".search").after("<div class='message'>これ以上ありません。</div>");
+            searchAftre("<div class='message'>これ以上ありません。</div>");
             return;
-          }
+          };
           pages++;
           search();
         });
         $(document).on("click", ".prev", function() {
-          return false;
           if(pages !== 1) {
             pages--;
             search();
-          }
+          };
+          return false;
         });
-        // クリックイベント修了---------------------------------
-        // -------------内容まとめ------------------
-        function doneConect() {
+        // --------------------------クリックイベント修了---------------------------------
+        // -------------doneの内容まとめ------------------
+        function doneConect(data) {
+          console.log(data.page);
           allPage = data.pageCount;
           if(data.count === 0) {
             vanish();
-            $(".search").after("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>"); 
+            searchAftre("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>"); 
             return;
-          }
-          //-----------あったら作品を表示-----------
+          };
+          //-----------------------あったら作品を表示---------------------------
           vanish();
           $(".js-pager").remove();
           var portion = "";
+          
           $.each(data.Items, function(index, element) {
+            var thisItem = element.Item;
               portion += "<li class='lists__item'>" +
                           "<div class='lists__item__inner'>" +
-                            "<a href='" + element.Item.itemUrl + "'class='lists__item__link' target='_blank'>" +
-                              "<img src='" + element.Item.mediumImageUrl + "'class='lists__item__img' alt=''>" +
-                              "<p class='lists__item__detail titlename'>作品名：" + element.Item.title + "</p>" +
-                              "<p class='lists__item__detail'>作者　：" + element.Item.author + "</p>" +
-                              "<p class='lists__item__detail'>出版社：" + element.Item.publisherName + "</p>" +
+                            "<a href='" + thisItem.itemUrl + "'class='lists__item__link' target='_blank'>" +
+                              "<img src='" + thisItem.mediumImageUrl + "'class='lists__item__img' alt=''>" +
+                              "<p class='lists__item__detail titlename'>作品名：" + thisItem.title + "</p>" +
+                              "<p class='lists__item__detail'>作者　：" + thisItem.author + "</p>" +
+                              "<p class='lists__item__detail'>出版社：" + thisItem.publisherName + "</p>" +
                             "</a>" +
                           "</div>" +
                         "</li>";
@@ -105,10 +112,28 @@
             $("li.next").first("a").addClass('disabled');
           } else if (data.page === 1) {
             $("li.prev").first("a").addClass('disabled');
-          }
+          };
         };
-
-
+        // ---------------エラー時の挙動をfailConectに渡す-------------------
+        function failConect(error) {
+          vanish();
+            if(!error.responseJSON) {
+              searchAftre("<div class='message'>通信に失敗しました。インターネットの接続を確認してください。</div>"); 
+            return;
+            };
+            var errorcode = error.status;
+            switch (errorcode) {
+              case 400: 
+                searchAftre("<div class='message'>検索文字が空、もしくは半角英数1文字になっています</div>"); 
+                break;
+              case  429: 
+                searchAftre("<div class='message'>連打しないでください。</div>"); 
+                break;
+              default: 
+                searchAftre("<div class='message'>原因不明のエラー</div>");
+                break;
+            };
+        };
 
 
 
@@ -122,7 +147,7 @@
         function vanish() {
           $("ul").empty();
           $(".message").empty();
-        }
+        };
         //サーチの内容を定義ーーーーーーーーーーーーーーーーーーーーーー
         function search() {
           vanish();         //メッセージの初期化処理
@@ -141,26 +166,10 @@
               page: pages,
             }
           }).done(function(data) {           //ajaxとdata閉じ
-            doneConect();
+            doneConect(data);
            // この中にデータ取得後の動きを記述していきます。
-          }).fail(function(error) {
-            vanish();
-            if(!error.responseJSON) {
-              $(".search").after("<div class='message'>通信に失敗しました。インターネットの接続を確認してください。</div>"); 
-            return;
-            }
-            var errorcode = error.status;
-            switch (errorcode) {
-              case 400: 
-                $(".search").after("<div class='message'>検索文字が空、もしくは半角英数1文字になっています</div>"); 
-                break;
-              case  429: 
-                $(".search").after("<div class='message'>連打しないでください。</div>"); 
-                break;
-              default: 
-                $(".search").after("<div class='message'>原因不明のエラー</div>");
-                break;
-            }
+          }).fail(function(errorcoment) {
+            failConect(errorcoment);
             //------------------失敗時の処理（最後）--------------------------
           });   //fail.done
         };  //function search
