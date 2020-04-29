@@ -125,20 +125,20 @@
           pages = 1
           search();
         });
-        $(document).on("click", ".next", function() {
+        $(document).on("click", ".next", function(motion) {
           if(allPage === pages) {
             searchAftre("<div class='message'>これ以上ありません。</div>");
-            return;
+            return motion.preventDefault();
           };
           pages++;
           search();
         });
-        $(document).on("click", ".prev", function() {
+        $(document).on("click", ".prev", function(motion) {
           if(pages !== 1) {
             pages--;
             search();
           };
-          return false;
+          return motion.preventDefault();
         });
         //サーチに検索結果を渡すーーーーーーーーーーーーーーーーーーーーーー
         function search() {
