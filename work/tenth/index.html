@@ -40,18 +40,90 @@
       // 以下は今回使う$.ajaxの基本的な形です。
       //
       $(function() {  //クリックイベントなので無くても可
-        // -------------------------変数名定義-------------------------------
+        // -------------------------変数/関数まとめ-------------------------------
         var allPage;
         var pages = 1;
-        
+        function vanish() {
+          $("ul").empty();
+          $(".message").empty();
+        };
         function searchAftre(text) {
           $(".search").after(text);
         };
-        
+        function nextdisabled() {
+          $("li.next").first("a").addClass('disabled');
+        };
+        function prevdisabled() {
+          $("li.prev").first("a").addClass('disabled');
+        };
+        // -------------doneの内容まとめ------------------
+        function doneConect(data) {
+          allPage = data.pageCount;
+          if(data.count === 0) {
+            vanish();
+            searchAftre("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>"); 
+            return;
+          };
+          //-----------------------作品を表示---------------------------
+          vanish();
+          $(".js-pager").remove();
+          var portion = "";
+          $.each(data.Items, function(index, element) {
+            var thisItem = element.Item;
+            portion += "<li class='lists__item'>" +
+                          "<div class='lists__item__inner'>" +
+                            "<a href='" + thisItem.itemUrl + "'class='lists__item__link' target='_blank'>" +
+                              "<img src='" + thisItem.mediumImageUrl + "'class='lists__item__img' alt=''>" +
+                              "<p class='lists__item__detail titlename'>作品名：" + thisItem.title + "</p>" +
+                              "<p class='lists__item__detail'>作者　：" + thisItem.author + "</p>" +
+                              "<p class='lists__item__detail'>出版社：" + thisItem.publisherName + "</p>" +
+                            "</a>" +
+                          "</div>" +
+                        "</li>";
+          });
+          $("ul").first().append(portion);
+          //-------------------ページャ-----------------------
+          $(".container").after(
+            "<div class='js-pager'>" +
+              "<ul class='btn-wrapper'>" +
+                "<li class='prev btn-item'><a class='btn-anchor' href=\"#\">前へ</a></li>" +
+                "<li class='next btn-item'><a class='btn-anchor' href=\"#\">次へ</a></li>" +
+              "</ul1>" +
+            "</div>"
+          );
+          if(data.count <= 20) {
+            nextdisabled();
+            prevdisabled();
+          } else if (data.last === data.count) {
+            nextdisabled();
+          } else if (data.page === 1) {
+            prevdisabled();
+          };
+        };
+        // ---------------エラー時の挙動をfailConectに渡す-------------------
+        function failConect(error) {
+          vanish();
+          if(!error.responseJSON) {
+            searchAftre("<div class='message'>通信に失敗しました。インターネットの接続を確認してください。</div>"); 
+            return;
+          };
+          var errorcode = error.status;
+          switch (errorcode) {
+            case 400: 
+              searchAftre("<div class='message'>検索文字が空、もしくは半角英数1文字になっています</div>"); 
+              break;
+            case  429: 
+              searchAftre("<div class='message'>連打しないでください。</div>"); 
+              break;
+            default: 
+              searchAftre("<div class='message'>原因不明のエラー</div>");
+              break;
+          };
+        };
         //----------------------クリックイベントの作成--------------------------------
         $(document).on("click", ".search__btn", function() {
           pages = 1
-          search();                //searchで読み込みエラー
+          search();
         });
         $(document).on("click", ".next", function() {
           if(allPage === pages) {
@@ -68,97 +140,15 @@
           };
           return false;
         });
-        // --------------------------クリックイベント修了---------------------------------
-        // -------------doneの内容まとめ------------------
-        function doneConect(data) {
-          console.log(data.page);
-          allPage = data.pageCount;
-          if(data.count === 0) {
-            vanish();
-            searchAftre("<div class = message> 検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</div>"); 
-            return;
-          };
-          //-----------------------あったら作品を表示---------------------------
-          vanish();
-          $(".js-pager").remove();
-          var portion = "";
-          
-          $.each(data.Items, function(index, element) {
-            var thisItem = element.Item;
-              portion += "<li class='lists__item'>" +
-                          "<div class='lists__item__inner'>" +
-                            "<a href='" + thisItem.itemUrl + "'class='lists__item__link' target='_blank'>" +
-                              "<img src='" + thisItem.mediumImageUrl + "'class='lists__item__img' alt=''>" +
-                              "<p class='lists__item__detail titlename'>作品名：" + thisItem.title + "</p>" +
-                              "<p class='lists__item__detail'>作者　：" + thisItem.author + "</p>" +
-                              "<p class='lists__item__detail'>出版社：" + thisItem.publisherName + "</p>" +
-                            "</a>" +
-                          "</div>" +
-                        "</li>";
-          });
-          $("ul").first().append(portion);
-          //-------------------ページャを表示-----------------------
-          $(".container").after(
-            "<div class='js-pager'>" +
-              "<ul class='btn-wrapper'>" +
-                "<li class='prev btn-item'><a class='btn-anchor' href=\"#\">前へ</a></li>" +
-                "<li class='next btn-item'><a class='btn-anchor' href=\"#\">次へ</a></li>" +
-              "</ul1>" +
-            "</div>" );
-          if(data.count <= 20) {
-            $("li.next").first("a").addClass('disabled');
-            $("li.prev").first("a").addClass('disabled');
-          } else if (data.last === data.count) {
-            $("li.next").first("a").addClass('disabled');
-          } else if (data.page === 1) {
-            $("li.prev").first("a").addClass('disabled');
-          };
-        };
-        // ---------------エラー時の挙動をfailConectに渡す-------------------
-        function failConect(error) {
-          vanish();
-            if(!error.responseJSON) {
-              searchAftre("<div class='message'>通信に失敗しました。インターネットの接続を確認してください。</div>"); 
-            return;
-            };
-            var errorcode = error.status;
-            switch (errorcode) {
-              case 400: 
-                searchAftre("<div class='message'>検索文字が空、もしくは半角英数1文字になっています</div>"); 
-                break;
-              case  429: 
-                searchAftre("<div class='message'>連打しないでください。</div>"); 
-                break;
-              default: 
-                searchAftre("<div class='message'>原因不明のエラー</div>");
-                break;
-            };
-        };
-
-
-
-
-
-
-
-
-
-        // 初期化まとめ--------------------------------
-        function vanish() {
-          $("ul").empty();
-          $(".message").empty();
-        };
-        //サーチの内容を定義ーーーーーーーーーーーーーーーーーーーーーー
+        //サーチに検索結果を渡すーーーーーーーーーーーーーーーーーーーーーー
         function search() {
           vanish();         //メッセージの初期化処理
           var keyword = $(".search__text__input").val();
-          // -----------------------------ajax---------------------------
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/ 20130522',
             type: 'GET',
             datatype: 'json',
             data: {
-              // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内  に入れ  ましょう。
               applicationId: '1019399324990976605',
               hits: "20",
               keyword: keyword,
@@ -167,12 +157,11 @@
             }
           }).done(function(data) {           //ajaxとdata閉じ
             doneConect(data);
-           // この中にデータ取得後の動きを記述していきます。
           }).fail(function(errorcoment) {
             failConect(errorcoment);
-            //------------------失敗時の処理（最後）--------------------------
-          });   //fail.done
+          });   //fail
         };  //function search
+        // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内  に入れ  ましょう。
         //
         //
         // $.ajaxによってデータが取得できたら、必要なデータ(作品名とか作者名とか) を取得します。
