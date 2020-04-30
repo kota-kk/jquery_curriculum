@@ -129,7 +129,7 @@
           if(allPage === pages) {
             $(".message").empty();
             searchAfter("<div class='message'>これ以上ありません。</div>");
-            return motion.preventDefault();
+            return;
           };
           pages++;
           search();
