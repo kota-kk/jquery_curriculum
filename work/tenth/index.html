@@ -57,7 +57,7 @@
           $("li.prev").first("a").addClass('disabled');
         };
         // -------------doneの内容まとめ------------------
-        function doneConect(data) {
+        function doneConnect(data) {
           allPage = data.pageCount;
           if(data.count === 0) {
             vanish();
@@ -127,6 +127,7 @@
         });
         $(document).on("click", ".next", function(motion) {
           if(allPage === pages) {
+            $(".message").empty();
             searchAftre("<div class='message'>これ以上ありません。</div>");
             return motion.preventDefault();
           };
@@ -134,11 +135,11 @@
           search();
         });
         $(document).on("click", ".prev", function(motion) {
-          if(pages !== 1) {
-            pages--;
-            search();
+          if(pages === 1) {
+            return motion.preventDefault();
           };
-          return motion.preventDefault();
+          pages--;
+          search();
         });
         //サーチに検索結果を渡すーーーーーーーーーーーーーーーーーーーーーー
         function search() {
@@ -156,7 +157,7 @@
               page: pages,
             }
           }).done(function(data) {           //ajaxとdata閉じ
-            doneConect(data);
+            doneConnect(data);
           }).fail(function(errorcoment) {
             failConect(errorcoment);
           });   //fail
