@@ -70,7 +70,7 @@
           var portion = "";
           $.each(data.Items, function(index, element) {
             var thisItem = element.Item;
-            Portion += "<li class='lists__item'>" +
+            portion += "<li class='lists__item'>" +
                           "<div class='lists__item__inner'>" +
                             "<a href='" + thisItem.itemUrl + "'class='lists__item__link' target='_blank'>" +
                               "<img src='" + thisItem.mediumImageUrl + "'class='lists__item__img' alt=''>" +
@@ -81,7 +81,7 @@
                           "</div>" +
                         "</li>";
           });
-          $("ul").first().append(Portion);
+          $("ul").first().append(portion);
           //-------------------ページャ-----------------------
           $(".container").after(
             "<div class='js-pager'>" +
