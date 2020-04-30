@@ -42,7 +42,7 @@
       $(function() {  //クリックイベントなので無くても可
         // -------------------------変数/関数まとめ-------------------------------
         var allPage;
-        var Pages = 1;
+        var pages = 1;
         function vanish() {
           $("ul").empty();
           $(".message").empty();
@@ -122,23 +122,23 @@
         };
         //----------------------クリックイベントの作成--------------------------------
         $(document).on("click", ".search__btn", function() {
-          Pages = 1
+          pages = 1
           search();
         });
         $(document).on("click", ".next", function(motion) {
-          if(allPage === Pages) {
+          if(allPage === pages) {
             $(".message").empty();
             searchAfter("<div class='message'>これ以上ありません。</div>");
             return motion.preventDefault();
           };
-          Pages++;
+          pages++;
           search();
         });
         $(document).on("click", ".prev", function(motion) {
-          if(Pages === 1) {
+          if(pages === 1) {
             return motion.preventDefault();
           };
-          Pages--;
+          pages--;
           search();
         });
         //サーチに検索結果を渡すーーーーーーーーーーーーーーーーーーーーーー
@@ -154,7 +154,7 @@
               hits: "20",
               keyword: keyword,
               booksGenreId: '001',
-              page: Pages,
+              page: pages,
             }
           }).done(function(data) {           //ajaxとdata閉じ
             doneConnect(data);
